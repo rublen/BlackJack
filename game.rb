@@ -1,8 +1,11 @@
 require_relative 'deck'
 require_relative 'player'
 require_relative 'dealer'
+require_relative 'interface'
 
 class Game
+  include Interface
+
   attr_accessor :bets
   attr_reader :deck, :player, :dealer
 
@@ -48,47 +51,28 @@ class Game
       dealer.deal(deck.card)
     end
     display(:cards)
-    puts "#{player.name}'s points: #{player.points}"
+    puts_player_points
   end
-
-  def display(smth)
-    player.name.length < 12 ? n = 14 : n = player.name.length + 2
-    puts "-" * (n + 15)
-    puts "|" + " DEALER".center(12) + "|" + " #{player.name}".center(n) + "|"
-    puts "|" + '-' * (12) + "|" + '-' * (n) + "|"
-    puts "|" + "#{dealer.send(smth)}".center(12) + "|" + " #{player.send(smth)}".center(n) + "|"
-    puts "-" * (n + 15)
-   end
 
   def play_to_end
     dealer.hidden_cards = dealer.true_cards
     until over?
-      case player.step
+      case step
       when 'Hit' then player.deal(deck.card)
       when "Show cards" then break
       end
       dealer.points < 17 ? dealer.deal(deck.card) : next
     end
-    puts "\n--> CARDS"
-    display(:cards)
-    puts "\n--> SCORE"
-    display(:points)
+    puts_result_tables
   end
 
   def start
     deal_2_cards
     place_the_bet
     play_to_end
-
-    if draw? # ничья
-      puts "We've got the draw. Money go to their homes"
-    else
-      puts "#{winner.name} won! Money go to #{winner.name}'s bank!"
-    end
-
+    puts_winner
     share_money
-    puts "\n--> BANKS"
-    display(:bank)
+    puts_banks
   end
 
   def reset
