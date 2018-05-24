@@ -24,16 +24,13 @@ class Game
   end
 
   def draw?
-    return false if player.points > 21
-    player.points == dealer.points
+    (player.points == dealer.points) || (player.points > 21 && dealer.points > 21)
   end
 
   def winner
-    p_points = player.points
-    d_points = dealer.points
     return dealer if player.points > 21
     return player if dealer.points > 21
-    return player.points > dealer.points ? player : dealer
+    player.points > dealer.points ? player : dealer
   end
 
   def share_money

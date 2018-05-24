@@ -13,7 +13,7 @@ loop do
     break
   end
   puts "#{game.player.name}, nice game! Would you like to win all my money?"
-  print "Enter 'y' to continue or 'n' to halt: "
+  print "Enter 'y' to continue or 'n' to quit: "
   break if gets.strip.downcase == 'n'
   game.reset
   puts "\n\n--> NEW GAME!"
