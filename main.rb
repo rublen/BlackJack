@@ -1,14 +1,20 @@
 require_relative 'game'
 
 puts "Hi! I'm Jack. Black Jack. What's your name? "
-name = gets.chomp.capitalize
+name = gets.chomp.upcase
 puts "Let's start our game, #{name}! Say godbye to your money!"
 
 game = Game.new(name)
-puts " * * "
-2.times do
-  display game.deal(player)
-  game.deal(dealer)
+
+loop do
+  game.start
+  if game.dealer.bank.zero?
+    puts "#{game.player.name}, congratulations! Game is over. You won all my money!"
+    break
+  end
+  puts "#{game.player.name}, nice game! Would you like to win all my money?"
+  print "Enter 'y' to continue or 'n' to halt: "
+  break if gets.strip.downcase == 'n'
+  game.reset
+  puts "\n\n--> NEW GAME!"
 end
-puts "#{name}'s score: "
-game.place_the _bet
