@@ -5,25 +5,33 @@ require_relative 'interface'
 
 class Game
   include Interface
+  INITIAL_BALANCE = 100
+  RATE = 10
 
   attr_accessor :bets
   attr_reader :deck, :player, :dealer
 
-  def initialize(name)
+  def initialize
     @deck = Deck.new
-    @player = Player.new(name)
+    @player = Player.new(ask_the_name)
     @dealer = Dealer.new
     @bets = 0
+    set_initial_balance
+  end
+
+  def set_initial_balance
+    player.bank = INITIAL_BALANCE
+    dealer.bank = INITIAL_BALANCE
   end
 
   def place_the_bet
-    self.bets += 20
-    player.bank -= 10
-    dealer.bank -= 10
+    self.bets += RATE * 2
+    player.bank -= RATE
+    dealer.bank -= RATE
   end
 
   def over?
-    (player.cards.size == 3) || (dealer.cards.size == 3)
+    (player.cards_values.size == 3) || (dealer.cards_values.size == 3)
   end
 
   def draw?
@@ -78,8 +86,10 @@ class Game
   def reset
     @deck = Deck.new
     @bets = 0
-    player.cards = []
-    dealer.cards = []
-    dealer.hidden_cards = ['*', '*']
+    player.cards = ''
+    player.cards_values = []
+    dealer.cards = ''
+    dealer.cards_values = []
+    dealer.hidden_cards = 'X  X'
   end
 end
