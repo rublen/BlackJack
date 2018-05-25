@@ -1,19 +1,11 @@
-require_relative 'methods'
+require_relative 'player'
 
-class Dealer
-  include Methods
-
-  attr_accessor :hidden_cards, :bank
-  attr_writer :cards
+class Dealer < Player
+  attr_accessor :hidden_cards
 
   def initialize
-    @cards = []
-    @hidden_cards = ['*', '*']
-    @bank = 100
-  end
-
-  def name
-    'DEALER'
+    super
+    @hidden_cards = 'X  X'
   end
 
   def cards
@@ -22,9 +14,5 @@ class Dealer
 
   def true_cards
     @cards
-  end
-
-  def deal(card)
-    @cards << card
   end
 end
