@@ -1,26 +1,37 @@
 require_relative 'deck'
 require_relative 'player'
 require_relative 'dealer'
+require_relative 'interface'
 
 class Game
+  include Interface
+  INITIAL_BALANCE = 100
+  RATE = 10
+
   attr_accessor :bets
   attr_reader :deck, :player, :dealer
 
-  def initialize(name)
+  def initialize
     @deck = Deck.new
-    @player = Player.new(name)
+    @player = Player.new(ask_the_name)
     @dealer = Dealer.new
     @bets = 0
+    set_initial_balance
+  end
+
+  def set_initial_balance
+    player.bank = INITIAL_BALANCE
+    dealer.bank = INITIAL_BALANCE
   end
 
   def place_the_bet
-    self.bets += 20
-    player.bank -= 10
-    dealer.bank -= 10
+    self.bets += RATE * 2
+    player.bank -= RATE
+    dealer.bank -= RATE
   end
 
   def over?
-    (player.cards.size == 3) || (dealer.cards.size == 3)
+    (player.cards_values.size == 3) || (dealer.cards_values.size == 3)
   end
 
   def draw?
@@ -48,54 +59,37 @@ class Game
       dealer.deal(deck.card)
     end
     display(:cards)
-    puts "#{player.name}'s points: #{player.points}"
+    puts_player_points
   end
-
-  def display(smth)
-    player.name.length < 12 ? n = 14 : n = player.name.length + 2
-    puts "-" * (n + 15)
-    puts "|" + " DEALER".center(12) + "|" + " #{player.name}".center(n) + "|"
-    puts "|" + '-' * (12) + "|" + '-' * (n) + "|"
-    puts "|" + "#{dealer.send(smth)}".center(12) + "|" + " #{player.send(smth)}".center(n) + "|"
-    puts "-" * (n + 15)
-   end
 
   def play_to_end
     dealer.hidden_cards = dealer.true_cards
     until over?
-      case player.step
+      case step
       when 'Hit' then player.deal(deck.card)
       when "Show cards" then break
       end
       dealer.points < 17 ? dealer.deal(deck.card) : next
     end
-    puts "\n--> CARDS"
-    display(:cards)
-    puts "\n--> SCORE"
-    display(:points)
+    puts_result_tables
   end
 
   def start
     deal_2_cards
     place_the_bet
     play_to_end
-
-    if draw? # ничья
-      puts "We've got the draw. Money go to their homes"
-    else
-      puts "#{winner.name} won! Money go to #{winner.name}'s bank!"
-    end
-
+    puts_winner
     share_money
-    puts "\n--> BANKS"
-    display(:bank)
+    puts_banks
   end
 
   def reset
     @deck = Deck.new
     @bets = 0
-    player.cards = []
-    dealer.cards = []
-    dealer.hidden_cards = ['*', '*']
+    player.cards = ''
+    player.cards_values = []
+    dealer.cards = ''
+    dealer.cards_values = []
+    dealer.hidden_cards = 'X  X'
   end
 end
